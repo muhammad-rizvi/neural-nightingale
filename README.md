@@ -3,7 +3,7 @@
 **A bird species classifier that runs entirely in your browser.**
 Take or upload a photo of a bird and a fine-tuned ResNet-18 names it as one of 15 North American species, with its top 3 guesses and how confident it is. Everything runs on your own device. The photo is never uploaded.
 
-**Live demo:** `https://<your-username>.github.io/neural-nightingale/` *(replace once GitHub Pages is on)*
+**Live demo:** <https://muhammad-rizvi.github.io/neural-nightingale/>
 
 | | |
 |---|---|
