@@ -1,0 +1,11 @@
+# The original PyTorch checkpoint (~45 MB). The website only needs model.onnx,
+# so keep model.pth on your computer / Google Drive instead of in the repo.
+model.pth
+
+# Python / Jupyter clutter
+__pycache__/
+.ipynb_checkpoints/
+
+# macOS and editor clutter
+.DS_Store
+.claude/

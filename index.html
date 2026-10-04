@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Neural Nightingale</title>
+  <meta name="description" content="A ResNet-18 bird classifier that runs entirely in your browser. Fifteen North American species, trained on CUB-200-2011.">
+  <meta name="theme-color" content="#0a0c09">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Start downloading the model right away, while the rest of the page loads -->
+  <link rel="preload" href="model.onnx" as="fetch" crossorigin>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Neural Nightingale, home">
+      <img src="icon.svg" alt="" width="28" height="28">
+      <span>Neural Nightingale</span>
+    </a>
+    <nav class="nav">
+      <a href="#species">Species</a>
+      <a href="#how">About</a>
+    </nav>
+  </header>
+
+  <main id="top" class="layout">
+    <!-- ============ The "portal": photo drop zone + headline ============ -->
+    <section class="stage" aria-label="Identify a bird">
+      <div class="portal" id="portal" data-state="idle">
+        <svg class="moss" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 400 500">
+          <filter id="moss-texture" x="0" y="0" width="100%" height="100%">
+            <!-- big soft clumps + fine fuzz = a bumpy moss surface -->
+            <feTurbulence type="fractalNoise" baseFrequency="0.014 0.02" numOctaves="4" seed="11" result="clumps"/>
+            <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="fuzz"/>
+            <feComposite in="clumps" in2="fuzz" operator="arithmetic" k2="1" k3="0.4" k4="-0.15" result="surface"/>
+            <!-- light it from the top-left so the bumps get highlights and shadows -->
+            <feDiffuseLighting in="surface" surfaceScale="9" diffuseConstant="1" lighting-color="#c4dc6c" result="lit">
+              <feDistantLight azimuth="235" elevation="34"/>
+            </feDiffuseLighting>
+            <feColorMatrix in="lit" type="matrix" values="0.36 0 0 0 0  0 0.5 0 0 0.01  0 0 0.16 0 0  0 0 0 1 0" result="moss"/>
+            <!-- large, slow shading variation for depth (with a hint of bark brown) -->
+            <feTurbulence type="fractalNoise" baseFrequency="0.005 0.007" numOctaves="2" seed="5" result="shade"/>
+            <feColorMatrix in="shade" type="matrix" values="1 0 0 0 0.22  0.9 0 0 0 0.2  0.7 0 0 0 0.16  0 0 0 0 1" result="shadeTint"/>
+            <feBlend in="moss" in2="shadeTint" mode="multiply"/>
+          </filter>
+          <rect width="400" height="500" filter="url(#moss-texture)"/>
+        </svg>
+        <div class="mist" aria-hidden="true"></div>
+
+        <!-- Idle state: a floating mossy stone with a small bird -->
+        <svg class="floater" viewBox="0 0 200 220" aria-hidden="true">
+          <defs>
+            <linearGradient id="rock" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#8d9aa0"/>
+              <stop offset=".55" stop-color="#5a666d"/>
+              <stop offset="1" stop-color="#2c3438"/>
+            </linearGradient>
+            <filter id="stone-grain" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="2" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.1  0 0 0 0 0.12  0 0 0 0 0.12  0 0 0 2.4 -1.1" result="speck"/>
+              <feComposite in="speck" in2="SourceGraphic" operator="in"/>
+            </filter>
+            <filter id="fringe" x="-10%" y="-10%" width="120%" height="130%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.22" numOctaves="2" seed="8" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <radialGradient id="moss-cap" cx=".45" cy=".3" r=".7">
+              <stop offset="0" stop-color="#b6cf62"/>
+              <stop offset=".6" stop-color="#5f7d2a"/>
+              <stop offset="1" stop-color="#2f4214"/>
+            </radialGradient>
+          </defs>
+          <path d="M42 92 C38 70 60 58 92 60 C126 62 156 66 160 88 C164 112 150 128 138 150 C126 172 116 204 104 210 C94 214 90 196 82 178 C72 156 46 124 42 92 Z" fill="url(#rock)"/>
+          <path d="M42 92 C38 70 60 58 92 60 C126 62 156 66 160 88 C164 112 150 128 138 150 C126 172 116 204 104 210 C94 214 90 196 82 178 C72 156 46 124 42 92 Z" fill="#000" filter="url(#stone-grain)"/>
+          <path d="M40 92 C36 68 60 56 92 58 C126 60 158 64 161 88 C156 100 146 96 140 112 C136 100 128 96 116 102 C104 108 96 120 90 112 C84 102 74 100 66 108 C58 116 50 104 40 92 Z" fill="url(#moss-cap)" filter="url(#fringe)"/>
+          <path d="M70 140 C78 150 84 166 90 186" stroke="#2c3438" stroke-width="2" fill="none" opacity=".6"/>
+          <circle cx="146" cy="104" r="5" fill="#e0793c"/>
+          <circle cx="152" cy="100" r="3" fill="#f0a060"/>
+          <!-- songbird perched on top -->
+          <path d="M84 62 C84 50 92 40 104 38 C108 30 117 27 123 32 L132 33 L124 37 C126 46 121 54 112 58 C104 61 94 62 84 62 Z M86 58 L60 52 L66 58 Z" fill="#1d2416"/>
+          <circle cx="119" cy="34" r="1.4" fill="#dfe6d2"/>
+        </svg>
+
+        <img class="photo" id="photo" alt="" hidden>
+        <div class="scan" aria-hidden="true"></div>
+
+        <p class="model-status" id="model-status" role="status">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="model-status-text">Loading model…</span>
+        </p>
+        <p class="drop-hint" aria-hidden="true">Drop or paste a photo</p>
+
+        <div class="portal-overlay">
+          <div class="idle-copy">
+            <p class="eyebrow">Runs in your browser · 15 species · nothing uploaded</p>
+            <h1>Name the bird<br>in the <em>frame</em></h1>
+          </div>
+          <div class="verdict-copy" aria-hidden="true">
+            <p class="eyebrow" id="verdict-eyebrow">Top match</p>
+            <p class="verdict-name" id="verdict-name"></p>
+          </div>
+          <div class="actions">
+            <button class="pill pill-glass only-touch" id="camera-btn" type="button">Take photo</button>
+            <button class="pill pill-light" id="choose-btn" type="button">Choose photo</button>
+          </div>
+        </div>
+
+        <input type="file" id="file-input" accept="image/*" hidden>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" hidden>
+      </div>
+    </section>
+
+    <div class="side">
+      <!-- ============ Results ============ -->
+      <section class="results" id="results" hidden aria-live="polite">
+        <div class="warning" id="warning" hidden>
+          <span class="warning-mark" aria-hidden="true">!</span>
+          <div>
+            <p class="warning-title">Not confident — this may not be one of the 15 species I know</p>
+            <p class="warning-body">The model always picks one of its 15 birds, even for something it has never seen. Below 80% confidence, take this guess with a grain of seed.</p>
+          </div>
+        </div>
+
+        <h2 class="section-label">Top 3 predictions</h2>
+        <ol class="bars" id="bars"></ol>
+
+        <figure class="model-eye">
+          <canvas id="crop-canvas" width="224" height="224"></canvas>
+          <figcaption>
+            <span class="section-label">What the model sees</span>
+            Your photo after preprocessing: shorter side resized to 256&nbsp;px, then the center 224&nbsp;×&nbsp;224 square. Anything outside this square is invisible to the model.
+          </figcaption>
+        </figure>
+      </section>
+
+      <p class="error" id="error" role="alert" hidden></p>
+
+      <!-- ============ The 15 species ============ -->
+      <section class="panel" id="species">
+        <h2 class="section-label">The fifteen it knows</h2>
+        <p class="lede">It can only answer with one of these. A robin, a parrot, or your cat will still get labelled as one of them, so watch the confidence.</p>
+        <ol class="species-list" id="species-list"></ol>
+      </section>
+
+      <!-- ============ How it works ============ -->
+      <section class="panel" id="how">
+        <h2 class="section-label">How it works</h2>
+        <ol class="pipeline">
+          <li><span>01</span>Resize the shorter side to 256&nbsp;px</li>
+          <li><span>02</span>Center-crop 224&nbsp;×&nbsp;224</li>
+          <li><span>03</span>Scale to 0–1, normalize with ImageNet mean / std</li>
+          <li><span>04</span>ResNet-18 → 15 logits</li>
+          <li><span>05</span>Softmax → top 3</li>
+        </ol>
+        <dl class="stats">
+          <div><dt>96.9%</dt><dd>test accuracy<br>(217 of 224)</dd></div>
+          <div><dt>15</dt><dd>species from<br>CUB-200-2011</dd></div>
+          <div><dt>11.2M</dt><dd>parameters,<br>ImageNet-pretrained</dd></div>
+        </dl>
+        <p class="lede">Everything runs locally with <a href="https://onnxruntime.ai/docs/tutorials/web/">ONNX Runtime Web</a>. The photo is never uploaded anywhere.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Trained on the <a href="https://www.vision.caltech.edu/datasets/cub_200_2011/">Caltech-UCSD Birds-200-2011</a> dataset
+      (Wah, Branson, Welinder, Perona &amp; Belongie, Caltech / UC San Diego, 2011), used here for educational, non-commercial purposes.
+      Dataset images belong to their original photographers.
+    </p>
+    <p class="footer-meta">ResNet-18 · PyTorch → ONNX · ONNX Runtime Web · Hosted on GitHub Pages</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
