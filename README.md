@@ -138,7 +138,7 @@ So the app shows *"Not confident — this may not be one of the 15 species I kno
 | File | What it does |
 |---|---|
 | `index.html` | Page structure: photo "portal", results, species list, credits |
-| `style.css` | All visual styling (dark mossy theme, mobile-first layout) |
+| `style.css` | All visual styling (starry-night theme, mobile-first layout) |
 | `app.js` | Loads the model, handles photos, runs inference, softmax, shows the top 3 |
 | `preprocess.js` | Exact JavaScript port of `eval_tfms` |
 | `model.onnx` | The trained network, exported from PyTorch |

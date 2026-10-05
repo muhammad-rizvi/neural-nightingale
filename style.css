@@ -1,22 +1,22 @@
 /* ==========================================================================
-   Neural Nightingale: dark, mossy, editorial.
+   Neural Nightingale: a starry night, navy and blue, editorial.
    Design tokens first, so the palette is easy to change in one place.
    ========================================================================== */
 :root {
   color-scheme: dark;
 
-  --bg: #0a0c09;
-  --bg-raised: #11150e;
-  --line: rgba(230, 238, 214, 0.12);
-  --text: #ecefe4;
-  --muted: rgba(236, 239, 228, 0.66);
-  --faint: rgba(236, 239, 228, 0.42);
+  --bg: #050816;
+  --bg-raised: #0b1230;
+  --line: rgba(200, 215, 255, 0.12);
+  --text: #eaf0ff;
+  --muted: rgba(234, 240, 255, 0.66);
+  --faint: rgba(234, 240, 255, 0.42);
 
-  --mist: #dfe6d6;
-  --moss: #b6cf62;
-  --moss-mid: #6f8f31;
-  --moss-deep: #2a3a14;
-  --ember: #e0793c;
+  --mist: #dbe4ff;
+  --accent: #9cc2ff;
+  --accent-mid: #4f74d9;
+  --accent-deep: #16244f;
+  --ember: #f0a35c;
 
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -40,8 +40,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(1200px 700px at 15% -10%, rgba(111, 143, 49, 0.14), transparent 60%),
-    radial-gradient(900px 600px at 110% 30%, rgba(224, 121, 60, 0.05), transparent 60%),
+    radial-gradient(1200px 700px at 15% -10%, rgba(79, 116, 217, 0.14), transparent 60%),
+    radial-gradient(900px 600px at 110% 30%, rgba(240, 163, 92, 0.05), transparent 60%),
     var(--bg);
   color: var(--text);
   font-family: var(--sans);
@@ -50,7 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* A faint film grain over everything, like the photo in the moodboard */
+/* A faint film grain over everything */
 body::after {
   content: "";
   position: fixed;
@@ -61,10 +61,27 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-a { color: inherit; text-underline-offset: 3px; text-decoration-color: rgba(182, 207, 98, 0.5); }
-a:hover { text-decoration-color: var(--moss); }
+/* A few faint stars across the whole page, behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(1px 1px at 20px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 160px 120px, rgba(200, 220, 255, 0.9), transparent),
+    radial-gradient(1.2px 1.2px at 300px 60px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 230px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 250px 280px, rgba(200, 220, 255, 0.8), transparent);
+  background-size: 347px 311px;
+}
 
-:focus-visible { outline: 2px solid var(--moss); outline-offset: 3px; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: rgba(156, 194, 255, 0.5); }
+a:hover { text-decoration-color: var(--accent); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ---------- Top bar ---------- */
 .topbar {
@@ -134,29 +151,75 @@ a:hover { text-decoration-color: var(--moss); }
   border-radius: var(--radius-xl);
   overflow: hidden;
   isolation: isolate;
-  background: #1b2412;
+  background: linear-gradient(180deg, #03060f 0%, #08112b 55%, #122155 100%);
   box-shadow:
     0 40px 80px -30px rgba(0, 0, 0, 0.8),
     0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }
 
-/* Mossy texture fills the whole frame... */
-.moss {
+/* ---------- Night sky ---------- */
+/* Stars are tiny radial gradients repeated in tiles. The three layers use
+   different tile sizes, so the pattern never visibly repeats. */
+.stars {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.stars-small {
+  background-image:
+    radial-gradient(1px 1px at 12px 18px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 47px 81px, rgba(200, 220, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 88px 33px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 121px 97px, rgba(220, 230, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 66px 6px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 104px 58px, rgba(190, 210, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 29px 104px, rgba(255, 255, 255, 0.75), transparent);
+  background-size: 137px 113px;
+}
+.stars-mid {
+  background-image:
+    radial-gradient(1.4px 1.4px at 40px 60px, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 190px 30px, rgba(210, 225, 255, 0.95), transparent),
+    radial-gradient(1.5px 1.5px at 120px 150px, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 220px 120px, rgba(200, 220, 255, 0.9), transparent),
+    radial-gradient(1.4px 1.4px at 80px 180px, rgba(255, 255, 255, 0.85), transparent);
+  background-size: 251px 197px;
+  animation: twinkle 5s ease-in-out infinite;
+}
+.stars-bright {
+  background-image:
+    radial-gradient(2px 2px at 70px 90px, #fff, transparent),
+    radial-gradient(9px 9px at 70px 90px, rgba(156, 194, 255, 0.35), transparent),
+    radial-gradient(2.2px 2.2px at 300px 40px, #fff, transparent),
+    radial-gradient(10px 10px at 300px 40px, rgba(156, 194, 255, 0.3), transparent),
+    radial-gradient(1.8px 1.8px at 210px 260px, #fff, transparent),
+    radial-gradient(8px 8px at 210px 260px, rgba(156, 194, 255, 0.3), transparent);
+  background-size: 389px 331px;
+  animation: twinkle 7s ease-in-out -3s infinite;
+}
+@keyframes twinkle { 50% { opacity: 0.45; } }
+
+/* A faint diagonal band of haze, like the Milky Way */
+.haze {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(125deg, transparent 15%, #000 45%, #000 55%, transparent 85%);
+  mask-image: linear-gradient(125deg, transparent 15%, #000 45%, #000 55%, transparent 85%);
 }
 
-/* ...and a pale misty clearing is cut out of the middle */
-.mist {
+/* Soft moonlight around the moon, darker toward the edges */
+.moonglow {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(ellipse 40% 34% at 50% 38%, rgba(229, 235, 222, 1) 0%, rgba(214, 223, 204, 0.95) 45%, rgba(160, 178, 138, 0.6) 70%, rgba(80, 100, 50, 0) 100%),
-    radial-gradient(ellipse 80% 70% at 50% 42%, transparent 45%, rgba(6, 9, 4, 0.55) 100%);
+    radial-gradient(circle at 52% 31%, rgba(190, 208, 255, 0.3) 0%, rgba(120, 150, 240, 0.12) 22%, transparent 48%),
+    radial-gradient(ellipse 85% 75% at 50% 40%, transparent 50%, rgba(2, 4, 12, 0.6) 100%);
 }
 
 .floater {
@@ -164,15 +227,15 @@ a:hover { text-decoration-color: var(--moss); }
   z-index: 2;
   left: 50%;
   top: 33%;
-  width: min(38%, 200px);
+  width: min(46%, 230px);
   translate: -50% -50%;
-  filter: drop-shadow(0 26px 22px rgba(30, 40, 20, 0.35));
-  animation: float 7s ease-in-out infinite;
+  filter: drop-shadow(0 0 28px rgba(190, 208, 255, 0.35));
+  animation: float 8s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-12px) rotate(1.5deg); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .drop-hint {
@@ -183,14 +246,14 @@ a:hover { text-decoration-color: var(--moss); }
   margin: 0;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(14, 18, 10, 0.55);
+  background: rgba(6, 10, 26, 0.55);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(223, 230, 214, 0.7);
+  color: rgba(219, 228, 255, 0.7);
 }
 @media (pointer: coarse) { .drop-hint { display: none; } }
 
@@ -212,7 +275,7 @@ a:hover { text-decoration-color: var(--moss); }
   z-index: 4;
   opacity: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, rgba(182, 207, 98, 0.22) 48%, rgba(223, 230, 214, 0.5) 50%, rgba(182, 207, 98, 0.22) 52%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(156, 194, 255, 0.22) 48%, rgba(219, 228, 255, 0.5) 50%, rgba(156, 194, 255, 0.22) 52%, transparent 100%);
   background-size: 100% 220%;
 }
 .portal[data-state="busy"] .scan { opacity: 1; animation: scan 1.4s linear infinite; }
@@ -230,7 +293,7 @@ a:hover { text-decoration-color: var(--moss); }
   gap: 8px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(14, 18, 10, 0.55);
+  background: rgba(6, 10, 26, 0.55);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-family: var(--mono);
@@ -246,7 +309,7 @@ a:hover { text-decoration-color: var(--moss); }
   background: var(--ember);
   animation: pulse 1.2s ease-in-out infinite;
 }
-.model-status[data-state="ready"] .dot { background: var(--moss); animation: none; }
+.model-status[data-state="ready"] .dot { background: var(--accent); animation: none; }
 .model-status[data-state="error"] .dot { background: #e5484d; animation: none; }
 @keyframes pulse { 50% { opacity: 0.3; } }
 
@@ -258,7 +321,7 @@ a:hover { text-decoration-color: var(--moss); }
   right: 0;
   bottom: 0;
   padding: 90px 22px 22px;
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 13, 8, 0.55) 35%, rgba(10, 13, 8, 0.9) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(5, 8, 22, 0.55) 35%, rgba(5, 8, 22, 0.9) 100%);
 }
 
 .eyebrow {
@@ -269,7 +332,7 @@ a:hover { text-decoration-color: var(--moss); }
   line-height: 1.6;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(223, 230, 214, 0.78);
+  color: rgba(219, 228, 255, 0.78);
 }
 
 h1,
@@ -280,10 +343,10 @@ h1,
   font-size: clamp(46px, 12.5vw, 76px);
   line-height: 0.9;
   letter-spacing: -0.015em;
-  color: #f4f6ee;
+  color: #f2f5ff;
   text-wrap: balance;
 }
-h1 em { font-style: italic; color: var(--moss); }
+h1 em { font-style: italic; color: var(--accent); }
 
 .verdict-copy { display: none; }
 .verdict-copy .eyebrow { max-width: none; }
@@ -314,24 +377,24 @@ h1 em { font-style: italic; color: var(--moss); }
   transition: transform 0.15s ease, background 0.2s ease;
 }
 .pill:active { transform: scale(0.97); }
-.pill-light { background: #f4f6ee; color: #10140c; }
+.pill-light { background: #f2f5ff; color: #081026; }
 .pill-light:hover { background: #fff; }
 .pill-glass {
-  background: rgba(20, 26, 14, 0.6);
+  background: rgba(10, 16, 40, 0.6);
   color: var(--mist);
-  box-shadow: 0 0 0 1px rgba(223, 230, 214, 0.22) inset;
+  box-shadow: 0 0 0 1px rgba(219, 228, 255, 0.22) inset;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-.pill-glass:hover { background: rgba(40, 52, 26, 0.7); }
+.pill-glass:hover { background: rgba(24, 38, 84, 0.7); }
 
 /* "Take photo" only makes sense on phones/tablets */
 .only-touch { display: none; }
 @media (pointer: coarse) { .only-touch { display: inline-block; } }
 
 /* Drag-and-drop highlight */
-.portal.is-dragging { box-shadow: 0 0 0 2px var(--moss) inset, 0 40px 80px -30px rgba(0, 0, 0, 0.8); }
-.portal.is-dragging .mist { background: radial-gradient(ellipse 52% 46% at 50% 40%, #eef3e6 0%, rgba(214, 223, 204, 0.96) 50%, rgba(80, 100, 50, 0) 100%); }
+.portal.is-dragging { box-shadow: 0 0 0 2px var(--accent) inset, 0 40px 80px -30px rgba(0, 0, 0, 0.8); }
+.portal.is-dragging .moonglow { background: radial-gradient(circle at 52% 31%, rgba(200, 216, 255, 0.45) 0%, rgba(120, 150, 240, 0.2) 30%, transparent 60%); }
 
 /* ==========================================================================
    Panels on the right (below, on phones)
@@ -368,8 +431,8 @@ h1 em { font-style: italic; color: var(--moss); }
   margin-bottom: 22px;
   padding: 16px;
   border-radius: var(--radius-m);
-  background: rgba(224, 121, 60, 0.1);
-  box-shadow: 0 0 0 1px rgba(224, 121, 60, 0.35) inset;
+  background: rgba(240, 163, 92, 0.1);
+  box-shadow: 0 0 0 1px rgba(240, 163, 92, 0.35) inset;
 }
 .warning-mark {
   flex: none;
@@ -384,7 +447,7 @@ h1 em { font-style: italic; color: var(--moss); }
   font-weight: 500;
   font-size: 13px;
 }
-.warning-title { margin: 1px 0 4px; font-weight: 600; color: #f6c9a6; }
+.warning-title { margin: 1px 0 4px; font-weight: 600; color: #f8d6b0; }
 .warning-body { margin: 0; font-size: 14px; color: var(--muted); }
 
 .bars { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 16px; }
@@ -404,12 +467,12 @@ h1 em { font-style: italic; color: var(--moss); }
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: rgba(223, 230, 214, 0.45);
+  background: rgba(219, 228, 255, 0.45);
   transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.bar-row:first-child .bar-fill { background: linear-gradient(90deg, var(--moss-mid), var(--moss)); }
+.bar-row:first-child .bar-fill { background: linear-gradient(90deg, var(--accent-mid), var(--accent)); }
 .bar-row:first-child .bar-pct { color: var(--text); }
-.results.is-low .bar-row:first-child .bar-fill { background: linear-gradient(90deg, #9a4d22, var(--ember)); }
+.results.is-low .bar-row:first-child .bar-fill { background: linear-gradient(90deg, #b0692e, var(--ember)); }
 
 .model-eye {
   display: flex;
@@ -457,7 +520,7 @@ h1 em { font-style: italic; color: var(--moss); }
   font-family: var(--serif);
   font-size: 21px;
   line-height: 1.2;
-  color: rgba(236, 239, 228, 0.86);
+  color: rgba(234, 240, 255, 0.86);
   transition: color 0.3s ease;
 }
 .species-list li span {
@@ -467,8 +530,8 @@ h1 em { font-style: italic; color: var(--moss); }
   color: var(--faint);
   min-width: 2ch;
 }
-.species-list li.is-match { color: var(--moss); }
-.species-list li.is-match span { color: var(--moss); }
+.species-list li.is-match { color: var(--accent); }
+.species-list li.is-match span { color: var(--accent); }
 .species-list li.is-match::after {
   content: "match";
   margin-left: auto;
@@ -491,9 +554,9 @@ h1 em { font-style: italic; color: var(--moss); }
   gap: 14px;
   align-items: baseline;
   font-size: 15px;
-  color: rgba(236, 239, 228, 0.86);
+  color: rgba(234, 240, 255, 0.86);
 }
-.pipeline span { font-family: var(--mono); font-size: 10.5px; color: var(--moss); }
+.pipeline span { font-family: var(--mono); font-size: 10.5px; color: var(--accent); }
 
 .stats {
   display: grid;
